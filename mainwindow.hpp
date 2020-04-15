@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QMap>
+#include <QSettings>
 class QHostAddress;
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 
 class UDPListener;
 class KeySender;
+class SetKeyDialog;
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -23,6 +24,7 @@ public:
     ~MainWindow();
 private slots:
     void onBindClicked();
+    void onKeySet(QStringList iStringList);
 
 private:
     Ui::MainWindow *ui;
@@ -31,5 +33,11 @@ private:
     quint16 _port = 3000;
     bool _isBinded = false;
     QMap<QString, QHostAddress> _ifacesMap;
+    QString _settingsFile;
+    SetKeyDialog *_setDialog = nullptr;
+    QSettings *_settings;
     void initInterfaces();
+    void loadSettings();
+    void saveSettings();
+    void aboutQt();
 };

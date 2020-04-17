@@ -13,7 +13,7 @@ public:
     explicit KeySender(QObject *parent = nullptr);
 
 public slots:
-    void sendKeyPress(const QString &iKey);
+    void sendKeyPress(const int &iKeyValue, const QString &iState);
 
 protected:
     BYTE getNativeKeyCode(const int &iKey);

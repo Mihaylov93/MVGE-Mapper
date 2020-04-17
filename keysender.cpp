@@ -8,20 +8,15 @@
 
 KeySender::KeySender(QObject *parent) : QObject(parent)
 {
-    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-
-    event->nativeScanCode();
 }
 
-void KeySender::sendKeyPress(const QString &iKey)
+void KeySender::sendKeyPress(const int &iKeyValue, const QString &iState)
 {
-    const QStringList mKey = iKey.split(':');
-    const int mKeyValue = QMetaEnum::fromType<Qt::Key>().keyToValue(mKey.at(0).toStdString().c_str());
-    const BYTE mVirtualKey = getNativeKeyCode(mKeyValue);
+    const BYTE mVirtualKey = getNativeKeyCode(iKeyValue);
 
-    if (mKey.at(1) == KEY_PRESSED)
+    if (iState == KEY_PRESSED)
         keybd_event(mVirtualKey, 0, 0, 0);
-    else if (mKey.at(1) == KEY_RELEASED)
+    else if (iState == KEY_RELEASED)
         keybd_event(mVirtualKey, 0, KEYEVENTF_KEYUP, 0);
 }
 

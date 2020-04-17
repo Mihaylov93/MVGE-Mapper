@@ -12,9 +12,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
+set_target_properties(Qt5::Core PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE "RELEASE")
 
-
-add_executable(MVGE_Mapper
+add_executable(MVGE_Mapper WIN32
   main.cpp
   mainwindow.cpp
   mainwindow.hpp
@@ -24,6 +24,7 @@ add_executable(MVGE_Mapper
   keysender.hpp
   setkeydialog.cpp
   setkeydialog.hpp
+  resources.qrc
   mainwindow.ui
 )
 

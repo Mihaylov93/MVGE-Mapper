@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>icons/Kofi_pixel_logo.png</file>
+        <file>icons/built-with-Qt_Horizontal_Small.png</file>
+    </qresource>
+</RCC>

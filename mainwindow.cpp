@@ -13,59 +13,73 @@
 
 #include <QDir>
 #include <QMetaEnum>
+#include <QRegExpValidator>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("MVGE Button Mapper");
     _udpListener = new UDPListener(this);
     _keySender = new KeySender(this);
-
     _settingsFile = QDir::currentPath() + "/config.ini";
     _settings = new QSettings(_settingsFile, QSettings::IniFormat);
 
+    ui->lePort->setValidator(new QRegExpValidator(QRegExp("[0-9]*"), ui->lePort));
     loadSettings();
 
     connect(ui->btnBind, &QPushButton::clicked, this, &MainWindow::onBindClicked);
-    connect(_udpListener, &UDPListener::keyReceived, _keySender, &KeySender::sendKeyPress);
+    connect(_udpListener, &UDPListener::keyReceived, this, &MainWindow::onKeyReceived);
 
     ui->statusbar->showMessage("Disconnected: Not listening.");
-
+    ui->tbLog->append("INFO: Disconnected and not listening to any port.");
     _setDialog = new SetKeyDialog(this);
 
     QList<QPushButton *> mButtonList = ui->tabButtons->findChildren<QPushButton *>();
-    qDebug() << mButtonList.size();
 
     for (const auto *mButton : mButtonList) {
-
-        qDebug() << "   " << mButton->objectName();
         connect(mButton, &QPushButton::clicked, _setDialog, &SetKeyDialog::onSetClicked);
     }
 
     connect(_setDialog, &SetKeyDialog::setKey, this, &MainWindow::onKeySet);
-    aboutQt();
+
+    initMap();
 }
 
 MainWindow::~MainWindow()
 {
-    saveSettings();
     delete ui;
 }
 
 void MainWindow::onBindClicked()
 {
+    _port = static_cast<quint16>(ui->lePort->text().toInt());
+
     if (_isBinded) {
         _udpListener->unBind();
         _isBinded = false;
         ui->statusbar->showMessage("Disconnected: Not listening.");
+        ui->btnBind->setText("Bind");
+        ui->lePort->setDisabled(false);
         return;
     }
 
     if (_udpListener->bind(QHostAddress::Any, _port)) {
-        ui->statusbar->showMessage("Connected: Listening on port " + QString::number(_port));
+        const QString mMessage = "Connected: Listening on port " + QString::number(_port);
+        ui->statusbar->showMessage(mMessage);
+        ui->tbLog->append("INFO: " + mMessage);
         _isBinded = true;
         ui->btnBind->setText("Disconnect");
+        ui->lePort->setDisabled(false);
+        checkPort();
+        _settings->setValue("port", _port);
+        _settings->sync();
+        ui->tbLog->append(QString("INFO: Port [%1] saved to settings.").arg(QString::number(_port)));
+        ui->lePort->setDisabled(true);
     } else {
-        ui->statusbar->showMessage("Disconnected: Bind on port " + QString::number(_port) + " unsuccessful!");
+        const QString mMessage = "Disconnected: Bind on port " + QString::number(_port) + " unsuccessful!";
+        ui->statusbar->showMessage(mMessage);
+        ui->tbLog->append("ERROR: " + mMessage);
         _isBinded = false;
+        ui->lePort->setDisabled(false);
     }
 }
 
@@ -78,6 +92,19 @@ void MainWindow::onKeySet(QStringList iStringList)
     // Save to settings
     _settings->setValue(mLabelName, iStringList.at(1));
     _settings->sync();
+    ui->tbLog->append(
+        QString("INFO: [%1] Set to [%2] and saved to settings.").arg(mLabelName.mid(2)).arg(iStringList.at(1)));
+}
+
+void MainWindow::onKeyReceived(const QString &iKey)
+{
+    const QStringList mKey = iKey.split(':');
+    const QString mLabelName = _mappedKeys.value(mKey.at(0));
+    const QLabel *mLabel = ui->tabButtons->findChild<QLabel *>(mLabelName);
+
+    const int mKeyValue = QMetaEnum::fromType<Qt::Key>().keyToValue(mLabel->text().toStdString().c_str());
+
+    if (mKeyValue != -1) _keySender->sendKeyPress(mKeyValue, mKey.at(1));
 }
 
 void MainWindow::loadSettings()
@@ -88,47 +115,63 @@ void MainWindow::loadSettings()
         if (mText != "") {
             // Check if its a valid value.
             const int mKeyValue = QMetaEnum::fromType<Qt::Key>().keyToValue(mText.toStdString().c_str());
-            if (mKeyValue != -1) ui->tabButtons->findChild<QLabel *>(mSettingKey)->setText(mText);
+            if (mKeyValue != -1) {
+                ui->tbLog->append(
+                    QString("INFO: [%1] Initialized to [%2] from settings.").arg(mSettingKey.mid(2)).arg(mText));
+                ui->tabButtons->findChild<QLabel *>(mSettingKey)->setText(mText);
+            }
         }
+    }
+
+    const QString mText = _settings->value("port", "").toString();
+    if (mText != "") {
+        ui->lePort->setText(mText);
+        ui->tbLog->append(QString("INFO: Port initialized to [%1] from settings.").arg(ui->lePort->text()));
     }
 }
 
-void MainWindow::saveSettings()
+void MainWindow::initMap()
 {
 
-    // qDebug() << _settingsFile;
-    //_settings.setValue("oooo", "AAAAA");
-    //_settings.sync();
+    _mappedKeys["Key_U"] = "lbX";
+    _mappedKeys["Key_I"] = "lbY";
+    _mappedKeys["Key_J"] = "lbA";
+    _mappedKeys["Key_K"] = "lbB";
+    _mappedKeys["Key_Y"] = "lbAltX";
+    _mappedKeys["Key_O"] = "lbAltY";
+    _mappedKeys["Key_H"] = "lbAltA";
+    _mappedKeys["Key_L"] = "lbAltB";
+
+    _mappedKeys["Key_Space"] = "lbSelect";
+    _mappedKeys["Key_Return"] = "lbStart";
+    _mappedKeys["Key_Minus"] = "lbAltSelect";
+    _mappedKeys["Key_Plus"] = "lbAltStart";
+
+    _mappedKeys["Key_Escape"] = "lbMenu";
+    _mappedKeys["Key_Backspace"] = "lbAltMenu";
+
+    _mappedKeys["Key_Up"] = "lbUp";
+    _mappedKeys["Key_Down"] = "lbDown";
+    _mappedKeys["Key_Left"] = "lbLeft";
+    _mappedKeys["Key_Right"] = "lbRight";
+
+    _mappedKeys["Key_Home"] = "lbLK1";
+    _mappedKeys["Key_PageUp"] = "lbLK2";
+    _mappedKeys["Key_PageDown"] = "lbLK4";
+    _mappedKeys["Key_End"] = "lbLK5";
 }
 
-void MainWindow::aboutQt()
+void MainWindow::checkPort()
 {
-    // Taken from src/widgets/dialogs/qmessagebox.cpp
-
-    //: Leave this text untranslated or include a verbatim copy of it below
-    //: and note that it is the authoritative version in case of doubt.
-    const QString translatedTextAboutQtText
-        = tr("<p>Qt is a C++ toolkit for cross-platform application "
-             "development.</p>"
-             "<p>Qt provides single-source portability across all major desktop "
-             "operating systems. It is also available for embedded Linux and other "
-             "embedded and mobile operating systems.</p>"
-             "<p>Qt is available under multiple licensing options designed "
-             "to accommodate the needs of our various users.</p>"
-             "<p>Qt licensed under our commercial license agreement is appropriate "
-             "for development of proprietary/commercial software where you do not "
-             "want to share any source code with third parties or otherwise cannot "
-             "comply with the terms of GNU (L)GPL.</p>"
-             "<p>Qt licensed under GNU (L)GPL is appropriate for the "
-             "development of Qt&nbsp;applications provided you can comply with the terms "
-             "and conditions of the respective licenses.</p>"
-             "<p>Please see <a href=\"http://%2/\">%2</a> "
-             "for an overview of Qt licensing.</p>"
-             "<p>Copyright (C) %1 The Qt Company Ltd and other "
-             "contributors.</p>"
-             "<p>Qt and the Qt logo are trademarks of The Qt Company Ltd.</p>"
-             "<p>Qt is The Qt Company Ltd product developed as an open source "
-             "project. See <a href=\"http://%3/\">%3</a> for more information.</p>")
-              .arg(QStringLiteral("2020"), QStringLiteral("qt.io/licensing"), QStringLiteral("qt.io"));
-    ui->tbAbout->setText(translatedTextAboutQtText);
+    // cat /proc/sys/net/ipv4/ip_local_port_range 32768   60999
+    if (_port >= quint16(32768) and _port <= quint16(60999)) {
+        ui->tbLog->append("WARNING: Using ephemeral ports (32768 - 60999 may lead to random issues.");
+    } else if (_port >= quint16(1) and _port <= quint16(1023)) {
+        ui->tbLog->append("WARNING: Using reserved ports (1 - 1024) may lead to random issues.");
+    } else if (_port == 0) {
+        ui->tbLog->append(
+            "ERROR: Using reserved port 0 is unavailable. Maybe you tried to use a port higher than (2^16)-1 ? ");
+        ui->tbLog->append("       Falling back to port 3000!");
+        _port = 3000;
+    }
 }

@@ -10,8 +10,8 @@ class MainWindow;
 QT_END_NAMESPACE
 
 //#define _WIN32_WINNT 0x0500
-#include <windows.h>
-#include <winuser.h>
+//#include <windows.h>
+//#include <winuser.h>
 
 class UDPListener;
 class KeySender;
@@ -22,9 +22,12 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
 private slots:
     void onBindClicked();
     void onKeySet(QStringList iStringList);
+    // void getKeyStroke(const QString &iRcvKeyName, QString &ioKeyToSend);
+    void onKeyReceived(const QString &iKey);
 
 private:
     Ui::MainWindow *ui;
@@ -36,8 +39,9 @@ private:
     QString _settingsFile;
     SetKeyDialog *_setDialog = nullptr;
     QSettings *_settings;
+    QMap<QString, QString> _mappedKeys;
     void initInterfaces();
     void loadSettings();
-    void saveSettings();
-    void aboutQt();
+    void initMap();
+    void checkPort();
 };

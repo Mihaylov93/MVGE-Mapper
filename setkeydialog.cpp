@@ -22,6 +22,11 @@ SetKeyDialog::SetKeyDialog(QWidget* parent) : QDialog(parent)
     this->setLayout(mHLayout);
 }
 
+quint32 SetKeyDialog::keyToNative(const Qt::Key& iKey)
+{
+    return _qtKeysToNativeMap.value(iKey);
+}
+
 void SetKeyDialog::onSetClicked()
 {
     _btnObjName = sender()->objectName();
@@ -38,6 +43,11 @@ void SetKeyDialog::keyReleaseEvent(QKeyEvent* iKeyEvent)
     mStringList << _btnObjName << mKey;
 
     qDebug() << mStringList;
+    qDebug() << iKeyEvent->key();
+    qDebug() << "nativeScanCode: " << iKeyEvent->nativeScanCode();
+    const quint32 mNativeVkey = iKeyEvent->nativeVirtualKey();
+    qDebug() << "nativeVirtual: " << iKeyEvent->nativeVirtualKey();
+    _qtKeysToNativeMap.insert(Qt::Key(iKeyEvent->key()), mNativeVkey);
     emit setKey(mStringList);
     this->hide();
 }

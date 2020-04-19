@@ -16,6 +16,5 @@ public slots:
 
 private:
     QString _btnObjName;
-    // QMap<Qt::Key, QVariant> _qtKeysToNativeMap;
     QMap<QString, QVariant> _qtKeysToNativeMap;
 };

@@ -6,6 +6,7 @@
 #include <QSizePolicy>
 #include <QKeyEvent>
 #include <QMetaEnum>
+
 SetKeyDialog::SetKeyDialog(QWidget* parent) : QDialog(parent)
 {
     this->setModal(true);
@@ -35,8 +36,6 @@ QMap<QString, QVariant>& SetKeyDialog::accessMap()
 void SetKeyDialog::onSetClicked()
 {
     _btnObjName = sender()->objectName();
-    // QPushButton* button = qobject_cast<QPushButton*>(sender());
-    // qDebug() << button;
     this->show();
 }
 

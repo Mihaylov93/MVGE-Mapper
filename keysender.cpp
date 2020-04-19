@@ -3,7 +3,10 @@
 #include <QMetaEnum>
 #include <QDebug>
 
+#if defined(Q_OS_LINUX)
 #include "x11sender.hpp"
+#endif
+
 #define KEY_PRESSED '1'
 #define KEY_RELEASED '0'
 

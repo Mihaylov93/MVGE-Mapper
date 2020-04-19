@@ -14,6 +14,7 @@
 #include <QDir>
 #include <QMetaEnum>
 #include <QRegExpValidator>
+#include <QVariant>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     _keySender = new KeySender(this);
     _settingsFile = QDir::currentPath() + "/config.ini";
     _settings = new QSettings(_settingsFile, QSettings::IniFormat);
+    _setDialog = new SetKeyDialog(this);
 
     ui->lePort->setValidator(new QRegExpValidator(QRegExp("[0-9]*"), ui->lePort));
     loadSettings();
@@ -31,7 +33,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->statusbar->showMessage("Disconnected: Not listening.");
     ui->tbLog->append("INFO: Disconnected and not listening to any port.");
-    _setDialog = new SetKeyDialog(this);
 
     QList<QPushButton *> mButtonList = ui->tabButtons->findChildren<QPushButton *>();
 
@@ -46,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    _settings->setValue("nativekeys", _setDialog->accessMap());
+    _settings->sync();
     delete ui;
 }
 
@@ -105,11 +108,11 @@ void MainWindow::onKeyReceived(const QString &iKey)
     const int mKeyValue = QMetaEnum::fromType<Qt::Key>().keyToValue(mLabel->text().toStdString().c_str());
 
 #if defined(Q_OS_WIN)
-    if (mKeyValue != -1) _keySender->sendKeyPress(_setDialog->keyToNative(Qt::Key(mKeyValue)), mKey.at(1));
+    if (mKeyValue != -1) _keySender->sendKeyPress(_setDialog->keyToNative(Qt::Key(mKeyValue)), mKey.at(1).trimmed());
 #endif
 
 #if defined(Q_OS_LINUX)
-    if (mKeyValue != -1) _keySender->sendKeyPress(Qt::Key(mKeyValue), mKey.at(1));
+    if (mKeyValue != -1) _keySender->sendKeyPress(Qt::Key(mKeyValue), mKey.at(1).trimmed());
 #endif
 }
 
@@ -134,8 +137,10 @@ void MainWindow::loadSettings()
         ui->lePort->setText(mText);
         ui->tbLog->append(QString("INFO: Port initialized to [%1] from settings.").arg(ui->lePort->text()));
     }
-}
 
+    const QMap<QString, QVariant> mMap = _settings->value("nativekeys", "").toMap();
+    if (!mMap.isEmpty()) _setDialog->accessMap() = mMap;
+}
 void MainWindow::initMap()
 {
 

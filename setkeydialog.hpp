@@ -7,6 +7,7 @@ class SetKeyDialog : public QDialog {
 public:
     explicit SetKeyDialog(QWidget *parent = nullptr);
     quint32 keyToNative(const Qt::Key &iKey);
+    QMap<QString, QVariant> &accessMap();
 signals:
     void setKey(QStringList);
 public slots:
@@ -15,5 +16,6 @@ public slots:
 
 private:
     QString _btnObjName;
-    QMap<Qt::Key, quint32> _qtKeysToNativeMap;
+    // QMap<Qt::Key, QVariant> _qtKeysToNativeMap;
+    QMap<QString, QVariant> _qtKeysToNativeMap;
 };

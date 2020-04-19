@@ -108,11 +108,11 @@ void MainWindow::onKeyReceived(const QString &iKey)
     const int mKeyValue = QMetaEnum::fromType<Qt::Key>().keyToValue(mLabel->text().toStdString().c_str());
 
 #if defined(Q_OS_WIN)
-    if (mKeyValue != -1) _keySender->sendKeyPress(_setDialog->keyToNative(Qt::Key(mKeyValue)), mKey.at(1));
+    if (mKeyValue != -1) _keySender->sendKeyPress(_setDialog->keyToNative(Qt::Key(mKeyValue)), mKey.at(1).trimmed());
 #endif
 
 #if defined(Q_OS_LINUX)
-    if (mKeyValue != -1) _keySender->sendKeyPress(Qt::Key(mKeyValue), mKey.at(1));
+    if (mKeyValue != -1) _keySender->sendKeyPress(Qt::Key(mKeyValue), mKey.at(1).trimmed());
 #endif
 }
 

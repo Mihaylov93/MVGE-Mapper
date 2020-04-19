@@ -16,12 +16,15 @@ X11Sender::~X11Sender()
 
 void X11Sender::keyDown(const unsigned int &iKey)
 {
-    XTestFakeKeyEvent(_display, iKey, True, 0);
+    const unsigned char mKeycode = XKeysymToKeycode(_display, iKey);
+    XTestFakeKeyEvent(_display, mKeycode, True, 0);
     XFlush(_display);
+
 }
 
 void X11Sender::keyUp(const unsigned int &iKey)
 {
-    XTestFakeKeyEvent(_display, iKey, False, 0);
+    const unsigned char mKeycode = XKeysymToKeycode(_display, iKey);
+    XTestFakeKeyEvent(_display, mKeycode, False, 0);
     XFlush(_display);
 }

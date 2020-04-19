@@ -3,20 +3,21 @@
 #include <QMetaEnum>
 #include <QDebug>
 
+#include "x11sender.hpp"
 #define KEY_PRESSED '1'
 #define KEY_RELEASED '0'
 
 KeySender::KeySender(QObject *parent) : QObject(parent)
 {
 #if defined(Q_OS_LINUX)
-    display = XOpenDisplay(NULL);
+    _x11Sender = new X11Sender();
 #endif
 }
 
 KeySender::~KeySender()
 {
 #if defined(Q_OS_LINUX)
-    XCloseDisplay(_display);
+    delete _x11Sender;
 #endif
 }
 
@@ -31,11 +32,9 @@ void KeySender::sendKeyPress(const quint32 &iKeyValue, const QString &iState)
 
 #if defined(Q_OS_LINUX)
     if (iState == KEY_PRESSED) {
-        XTestFakeKeyEvent(_display, iKeyValue, True, 0);
-        XFlush(_display);
+        _x11Sender->keyDown(iKeyValue);
     } else if (iState == KEY_RELEASED) {
-        XTestFakeKeyEvent(_display, iKeyValue, False, 0);
-        XFlush(_display);
+        _x11Sender->keyUp(iKeyValue);
     }
 #endif
 

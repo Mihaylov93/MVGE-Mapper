@@ -47,7 +47,6 @@ void SetKeyDialog::keyReleaseEvent(QKeyEvent* iKeyEvent)
 
     qDebug() << mStringList;
     qDebug() << iKeyEvent->key();
-
 #if defined(Q_OS_LINUX)
     qDebug() << "nativeScanCode: " << iKeyEvent->nativeScanCode();
     const quint32 mNativeKey = iKeyEvent->nativeScanCode();

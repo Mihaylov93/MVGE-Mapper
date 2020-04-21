@@ -1,26 +1,27 @@
-#include "x11sender.hpp"
+#include "xlibkeysender.hpp"
 
-
+#include "X11/Xlib.h"
+#include "X11/extensions/XTest.h"
 #include "X11/keysym.h"
 #include "X11/keysymdef.h"
 
-X11Sender::X11Sender()
+XlibKeysender::XlibKeysender()
 {
     _display = XOpenDisplay(nullptr);
 }
 
-X11Sender::~X11Sender()
+XlibKeysender::~XlibKeysender()
 {
     XCloseDisplay(_display);
 }
 
-void X11Sender::keyDown(const unsigned int &iKey)
+void XlibKeysender::keyDown(const unsigned int &iKey)
 {
     XTestFakeKeyEvent(_display, iKey, True, 0);
     XFlush(_display);
 }
 
-void X11Sender::keyUp(const unsigned int &iKey)
+void XlibKeysender::keyUp(const unsigned int &iKey)
 {
     XTestFakeKeyEvent(_display, iKey, False, 0);
     XFlush(_display);

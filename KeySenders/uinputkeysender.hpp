@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basekeysender.hpp"
+#include <set>
 
 class UinputKeySender : public BaseKeySender {
 public:
@@ -10,8 +11,8 @@ public:
     void keyUp(const unsigned int &iKey) override;
 
 private:
-    int fd;
+    int _device;
     std::set<unsigned int> mEnabledKeys;
 
-    void emitEvent(int fd, int type, int code, int val);
+    void emitEvent(const int &iDevice, const int &iType, const int &iCode, const int &iVal);
 };

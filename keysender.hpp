@@ -7,13 +7,13 @@
 #elif defined(Q_OS_LINUX)
 
 #if defined(USE_XLIB)
-#include "KeySenders/xlibkeysender.h"
-#elif
-#include "KeySenders/uinputkeysender.h"
+#include "KeySenders/xlibkeysender.hpp"
+#else
+#include "KeySenders/uinputkeysender.hpp"
 #endif
 
 #elif defined(Q_OS_MAC)
-#include "KeySenders/mackeysender.h"
+#include "KeySenders/mackeysender.hpp"
 #endif
 
 class KeySender : public QObject {

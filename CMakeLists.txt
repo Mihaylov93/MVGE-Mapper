@@ -42,8 +42,6 @@ if(LINUX)
           keysender.hpp
           setkeydialog.cpp
           setkeydialog.hpp
-          x11sender.cpp
-          x11sender.hpp
           resources.qrc
 
           KeySenders/basekeysender.cpp
@@ -66,8 +64,6 @@ if(LINUX)
           keysender.hpp
           setkeydialog.cpp
           setkeydialog.hpp
-          x11sender.cpp
-          x11sender.hpp
           resources.qrc
 
           KeySenders/basekeysender.cpp

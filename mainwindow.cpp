@@ -1,7 +1,6 @@
 #include "mainwindow.hpp"
 #include "./ui_mainwindow.h"
 #include "udplistener.hpp"
-#include "keysender.hpp"
 
 #include "setkeydialog.hpp"
 
@@ -10,18 +9,19 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <QPushButton>
-
-#include <QDir>
 #include <QMetaEnum>
 #include <QRegExpValidator>
 #include <QVariant>
+
+#include "keysender.hpp"
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     setWindowTitle("MVGE Button Mapper");
     _udpListener = new UDPListener(this);
     _keySender = new KeySender(this);
-    _settingsFile = QDir::currentPath() + "/config.ini";
+    _settingsFile = qApp->applicationDirPath() + "/config.ini";
     _settings = new QSettings(_settingsFile, QSettings::IniFormat);
     _setDialog = new SetKeyDialog(this);
 

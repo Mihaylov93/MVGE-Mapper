@@ -12,8 +12,8 @@ KeySender::KeySender(QObject *parent) : QObject(parent)
     _keySender = new MsKeySender();
 #elif defined(Q_OS_LINUX)
 #if defined(USE_XLIB)
-    _keySender = new XlibKeySender();
-#elif
+    _keySender = new XlibKeysender();
+#else
     _keySender = new UinputKeySender();
 #endif
 

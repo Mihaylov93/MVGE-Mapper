@@ -1,9 +1,7 @@
 #pragma once
 #include "basekeysender.hpp"
 
-#include "X11/Xlib.h"
-#include "X11/extensions/XTest.h"
-
+struct _XDisplay;
 class XlibKeysender : public BaseKeySender {
 public:
     XlibKeysender();
@@ -12,5 +10,5 @@ public:
     void keyUp(const unsigned int &iKey) override;
 
 private:
-    Display *_display;
+    _XDisplay *_display;
 };

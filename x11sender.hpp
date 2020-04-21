@@ -1,7 +1,5 @@
 #pragma once
-#include "X11/Xlib.h"
 
-#include "X11/extensions/XTest.h"
 
 class X11Sender
 {
@@ -11,6 +9,7 @@ public:
 
     void keyDown(const unsigned int &iKey);
     void keyUp(const unsigned int &iKey);
+    void emitEvent(int,int,int,int);
 private:
-    Display *_display;
+    int fd;
 };

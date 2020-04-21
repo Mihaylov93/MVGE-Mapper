@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 
 class X11Sender
 {
@@ -12,4 +13,5 @@ public:
     void emitEvent(int,int,int,int);
 private:
     int fd;
+    std::set<unsigned int> mEnabledKeys;
 };

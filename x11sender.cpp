@@ -9,9 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
-
-
-
+#include <algorithm>
 
 X11Sender::X11Sender()
 {
@@ -24,6 +22,9 @@ X11Sender::X11Sender()
     usetup.id.vendor = 0x1234; /* sample vendor */
     usetup.id.product = 0x5678; /* sample product */
     strcpy(usetup.name, "Example device");
+
+    ioctl(fd, UI_SET_EVBIT, EV_KEY);
+    ioctl(fd, UI_SET_EVBIT, EV_SYN);
 
     ioctl(fd, UI_DEV_SETUP, &usetup);
     ioctl(fd, UI_DEV_CREATE);
@@ -55,8 +56,11 @@ void X11Sender::keyDown(const unsigned int &iKey)
 {
 
     const unsigned int mKeyCode = iKey-8;
-    ioctl(fd, UI_SET_EVBIT, EV_KEY);
-    ioctl(fd, UI_SET_KEYBIT, mKeyCode);
+    if (mEnabledKeys.find(mKeyCode) == mEnabledKeys.end()){
+
+        ioctl(fd, UI_SET_KEYBIT, mKeyCode);
+        mEnabledKeys.insert(mKeyCode);
+    }
 
     /* Key press, report the event*/
     emitEvent(fd, EV_KEY, mKeyCode, 1);

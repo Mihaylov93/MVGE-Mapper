@@ -1,9 +1,8 @@
-#include "x11sender.hpp"
+#include "uinputkeysender.hpp"
 
 #include <linux/input.h>
 #include <linux/uinput.h>
 #include <fcntl.h>
-
 
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +10,7 @@
 
 #include <algorithm>
 
-X11Sender::X11Sender()
+UinputKeySender::UinputKeySender()
 {
     struct uinput_setup usetup;
 
@@ -19,7 +18,7 @@ X11Sender::X11Sender()
 
     memset(&usetup, 0, sizeof(usetup));
     usetup.id.bustype = BUS_USB;
-    usetup.id.vendor = 0x1234; /* sample vendor */
+    usetup.id.vendor = 0x1234;  /* sample vendor */
     usetup.id.product = 0x5678; /* sample product */
     strcpy(usetup.name, "Example device");
 
@@ -29,34 +28,18 @@ X11Sender::X11Sender()
     ioctl(fd, UI_DEV_SETUP, &usetup);
     ioctl(fd, UI_DEV_CREATE);
     sleep(1);
-
 }
 
-X11Sender::~X11Sender()
+UinputKeySender::~UinputKeySender()
 {
     ioctl(fd, UI_DEV_DESTROY);
     close(fd);
 }
 
-void X11Sender::emitEvent(int fd, int type, int code, int val)
+void UinputKeySender::keyDown(const unsigned int &iKey)
 {
-   struct input_event ie;
-
-   ie.type = type;
-   ie.code = code;
-   ie.value = val;
-   /* timestamp values below are ignored */
-   ie.time.tv_sec = 0;
-   ie.time.tv_usec = 0;
-
-   write(fd, &ie, sizeof(ie));
-}
-
-void X11Sender::keyDown(const unsigned int &iKey)
-{
-
-    const unsigned int mKeyCode = iKey-8;
-    if (mEnabledKeys.find(mKeyCode) == mEnabledKeys.end()){
+    const unsigned int mKeyCode = iKey - 8;
+    if (mEnabledKeys.find(mKeyCode) == mEnabledKeys.end()) {
 
         ioctl(fd, UI_SET_KEYBIT, mKeyCode);
         mEnabledKeys.insert(mKeyCode);
@@ -65,13 +48,25 @@ void X11Sender::keyDown(const unsigned int &iKey)
     /* Key press, report the event*/
     emitEvent(fd, EV_KEY, mKeyCode, 1);
     emitEvent(fd, EV_SYN, SYN_REPORT, 0);
-
 }
 
-void X11Sender::keyUp(const unsigned int &iKey)
+void UinputKeySender::keyUp(const unsigned int &iKey)
 {
-       /* Key press, report the event*/
-       const unsigned int mKeyCode = iKey-8;
-       emitEvent(fd, EV_KEY, mKeyCode, 0);
-       emitEvent(fd, EV_SYN, SYN_REPORT, 0);
+    const unsigned int mKeyCode = iKey - 8;
+    emitEvent(fd, EV_KEY, mKeyCode, 0);
+    emitEvent(fd, EV_SYN, SYN_REPORT, 0);
+}
+
+void UinputKeySender::emitEvent(int fd, int type, int code, int val)
+{
+    struct input_event ie;
+
+    ie.type = type;
+    ie.code = code;
+    ie.value = val;
+    /* timestamp values below are ignored */
+    ie.time.tv_sec = 0;
+    ie.time.tv_usec = 0;
+
+    write(fd, &ie, sizeof(ie));
 }

@@ -19,8 +19,7 @@ find_package(Qt5 COMPONENTS Widgets Network REQUIRED)
 if(LINUX)
     find_package(X11 REQUIRED)
 
-    include_directories(${X11_INCLUDE_DIR})
-    link_directories(${X11_LIBRARIES})
+    include_directories(${LIBEVDEV_INCLUDE_DIR})
 
     add_executable(MVGE_Mapper
       main.cpp
@@ -38,7 +37,7 @@ if(LINUX)
       mainwindow.ui
     )
 
-    target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network ${X11_LIBRARIES} Xtst)
+    target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network)
 else()
     add_executable(MVGE_Mapper WIN32
       main.cpp

@@ -12,7 +12,7 @@
 #include "KeySenders/uinputkeysender.hpp"
 #endif
 
-#elif defined(Q_OS_MAC)
+#else
 #include "KeySenders/mackeysender.hpp"
 #endif
 

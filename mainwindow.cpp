@@ -15,6 +15,10 @@
 
 #include "keysender.hpp"
 
+#if not defined(Q_OS_LINUX) and not defined(Q_OS_WIN)
+    #define FORCE_REPAINT
+#endif
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -32,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(_udpListener, &UDPListener::keyReceived, this, &MainWindow::onKeyReceived);
 
     ui->statusbar->showMessage("Disconnected: Not listening.");
+
     ui->tbLog->append("INFO: Disconnected and not listening to any port.");
 
     QList<QPushButton *> mButtonList = ui->tabButtons->findChildren<QPushButton *>();
@@ -60,6 +65,9 @@ void MainWindow::onBindClicked()
         _udpListener->unBind();
         _isBinded = false;
         ui->statusbar->showMessage("Disconnected: Not listening.");
+        #if defined(FORCE_REPAINT)
+        ui->statusbar->repaint();
+        #endif
         ui->btnBind->setText("Bind");
         ui->lePort->setDisabled(false);
         return;
@@ -68,6 +76,9 @@ void MainWindow::onBindClicked()
     if (_udpListener->bind(QHostAddress::Any, _port)) {
         const QString mMessage = "Connected: Listening on port " + QString::number(_port);
         ui->statusbar->showMessage(mMessage);
+        #if defined(FORCE_REPAINT)
+        ui->statusbar->repaint();
+        #endif
         ui->tbLog->append("INFO: " + mMessage);
         _isBinded = true;
         ui->btnBind->setText("Disconnect");
@@ -80,6 +91,9 @@ void MainWindow::onBindClicked()
     } else {
         const QString mMessage = "Disconnected: Bind on port " + QString::number(_port) + " unsuccessful!";
         ui->statusbar->showMessage(mMessage);
+        #if defined(FORCE_REPAINT)
+        ui->statusbar->repaint();
+        #endif
         ui->tbLog->append("ERROR: " + mMessage);
         _isBinded = false;
         ui->lePort->setDisabled(false);

@@ -74,26 +74,49 @@ if(LINUX)
           mainwindow.ui
 
         )
-        target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network)
+        target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network )
     endif()
 
 else()
-    add_executable(MVGE_Mapper WIN32
-      main.cpp
-      mainwindow.cpp
-      mainwindow.hpp
-      udplistener.cpp
-      udplistener.hpp
-      keysender.cpp
-      keysender.hpp
-      setkeydialog.cpp
-      setkeydialog.hpp
-      resources.qrc
-      mainwindow.ui
-      KeySenders/basekeysender.cpp
-      KeySenders/basekeysender.hpp
-      KeySenders/mskeysender.cpp
-      KeySenders/mskeysender.hpp
-    )
-    target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network)
+    if(APPLE)
+      message(STATUS "Configuring for OS Apple")
+      add_executable(MVGE_Mapper
+        main.cpp
+        mainwindow.cpp
+        mainwindow.hpp
+        udplistener.cpp
+        udplistener.hpp
+        keysender.cpp
+        keysender.hpp
+        setkeydialog.cpp
+        setkeydialog.hpp
+        resources.qrc
+        mainwindow.ui
+        KeySenders/basekeysender.cpp
+        KeySenders/basekeysender.hpp
+        KeySenders/mackeysender.cpp
+        KeySenders/mackeysender.hpp
+      )
+      target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network "-framework Carbon" "-framework ApplicationServices" ) 
+    else()
+      add_executable(MVGE_Mapper WIN32
+        main.cpp
+        mainwindow.cpp
+        mainwindow.hpp
+        udplistener.cpp
+        udplistener.hpp
+        keysender.cpp
+        keysender.hpp
+        setkeydialog.cpp
+        setkeydialog.hpp
+        resources.qrc
+        mainwindow.ui
+        KeySenders/basekeysender.cpp
+        KeySenders/basekeysender.hpp
+        KeySenders/mskeysender.cpp
+        KeySenders/mskeysender.hpp
+      )
+      target_link_libraries(MVGE_Mapper PRIVATE Qt5::Widgets Qt5::Network)
+    endif()
+    
 endif()

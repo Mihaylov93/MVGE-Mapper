@@ -16,8 +16,7 @@ KeySender::KeySender(QObject *parent) : QObject(parent)
 #else
     _keySender = new UinputKeySender();
 #endif
-
-#elif defined(Q_OS_MAC)
+#else // Q_OS_MAC
     _keySender = new MacKeySender();
 #endif
 }

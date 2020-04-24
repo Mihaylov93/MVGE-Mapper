@@ -50,8 +50,7 @@ void SetKeyDialog::keyReleaseEvent(QKeyEvent* iKeyEvent)
 #if defined(Q_OS_LINUX)
     qDebug() << "nativeScanCode: " << iKeyEvent->nativeScanCode();
     const quint32 mNativeKey = iKeyEvent->nativeScanCode();
-#endif
-#if defined(Q_OS_WIN)
+#else // Q_OS_LINUX and Q_OS_MAC
     qDebug() << "nativeVirtual: " << iKeyEvent->nativeVirtualKey();
     const quint32 mNativeKey = iKeyEvent->nativeVirtualKey();
 #endif

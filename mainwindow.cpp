@@ -116,6 +116,11 @@ void MainWindow::onKeySet(QStringList iStringList)
 void MainWindow::onKeyReceived(const QString &iKey)
 {
     const QStringList mKey = iKey.split(':');
+    // Validate external input. Example received key: "Key_Down:1"
+    if (mKey.size() < 2) {
+        return;
+    }
+
     const QString mLabelName = _mappedKeys.value(mKey.at(0));
     const QLabel *mLabel = ui->tabButtons->findChild<QLabel *>(mLabelName);
 

@@ -21,6 +21,7 @@ public:
 
 private slots:
     void onBindClicked();
+    void onClearClicked();
     void onKeySet(QStringList iStringList);
     // void getKeyStroke(const QString &iRcvKeyName, QString &ioKeyToSend);
     void onKeyReceived(const QString &iKey);

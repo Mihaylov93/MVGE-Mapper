@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     loadSettings();
 
     connect(ui->btnBind, &QPushButton::clicked, this, &MainWindow::onBindClicked);
+    connect(ui->btnClear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
     connect(_udpListener, &UDPListener::keyReceived, this, &MainWindow::onKeyReceived);
 
     ui->statusbar->showMessage("Disconnected: Not listening.");
@@ -98,6 +99,11 @@ void MainWindow::onBindClicked()
         _isBinded = false;
         ui->lePort->setDisabled(false);
     }
+}
+
+void MainWindow::onClearClicked()
+{
+    ui->tbLog->clear();
 }
 
 void MainWindow::onKeySet(QStringList iStringList)
